@@ -39,6 +39,8 @@
   
   <webApplication name="acmeair-bookingservice"
         location="acmeair-bookingservice-java-2.0.0-SNAPSHOT.war"
-        contextRoot="/" />
+        contextRoot="/">
+    <classloader apiTypeVisibility="api,ibm-api,spec,stable,third-party"/>
+  </webApplication>
   <cdi12 enableImplicitBeanArchives="false"/>
 </server>
