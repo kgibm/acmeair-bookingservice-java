@@ -39,7 +39,7 @@ import org.bson.Document;
 
 import org.eclipse.microprofile.opentracing.Traced;
 
-import io.opentracing.Span;
+import io.opentracing.Scope;
 import io.opentracing.Tracer;
 
 public class BookingServiceImpl implements BookingService, MongoConstants {
@@ -99,19 +99,13 @@ public class BookingServiceImpl implements BookingService, MongoConstants {
             .append("flightId", flightId).append("dateOfBooking", new Date())
             .append("flightSegmentId", flightSegmentId);
 
-        Span activeSpan = configuredTracer.activeSpan();
-        Tracer.SpanBuilder spanBuilder = configuredTracer.buildSpan("Created bookFlight Span");
-        if (activeSpan != null) {
-            spanBuilder.asChildOf(activeSpan.context());
+        try (Scope scope = configuredTracer.buildSpan("Created bookFlight Span").startActive(true)) {
+
+        	scope.span().setTag("Created", true);
+            
+            booking.insertOne(bookingDoc);
         }
         
-        Span childSpan = spanBuilder.startManual();
-        childSpan.setTag("Created", true);
-        
-        booking.insertOne(bookingDoc);
-        
-        childSpan.finish();
-
         return bookingId;
       } catch (Exception e) {
         throw new RuntimeException(e);
